@@ -1,0 +1,63 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id        Int        @id @default(autoincrement())
+  username  String
+  email     String     @unique
+  password  String
+  createdAt DateTime   @default(now())
+  updatedAt DateTime @updatedAt
+  tweets    Tweet[]    @relation("UserTweets")
+  responses Response[] @relation("UserResponses")
+  likes     Like[]     @relation("UserLikes")
+  products  Product[]  @relation("ProductSeller")
+}
+
+model Tweet {
+  id        Int        @id @default(autoincrement())
+  content   String
+  createdAt DateTime   @default(now())
+  user      User       @relation("UserTweets", fields: [userId], references: [id])
+  userId    Int
+  likes     Like[]     @relation("TweetLikes")
+  responses Response[] @relation("TweetResponses")
+}
+
+model Response {
+  id        Int      @id @default(autoincrement())
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation("UserResponses", fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int
+  tweet     Tweet    @relation("TweetResponses", fields: [tweetId], references: [id], onDelete: Cascade)
+  tweetId   Int
+}
+
+model Like {
+  id     Int   @id @default(autoincrement())
+  user   User  @relation("UserLikes", fields: [userId], references: [id], onDelete: Cascade)
+  userId Int
+  tweet  Tweet @relation("TweetLikes", fields: [tweetId], references: [id], onDelete: Cascade)
+  tweetId Int
+
+  @@unique([tweetId, userId]) // 복합 고유 제약 조건 추가
+}
+
+model Product {
+  id        Int        @id @default(autoincrement())
+  url       String
+  name      String
+  price     Int
+  createdAt DateTime   @default(now())
+  updatedAt DateTime @updatedAt
+  seller    User      @relation("ProductSeller", fields: [sellerId], references: [id], onDelete: Cascade)
+  sellerId  Int
+}
