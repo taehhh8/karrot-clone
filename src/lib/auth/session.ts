@@ -5,7 +5,7 @@ import { User } from "@prisma/client";
 import { SessionData } from "@/types/auth";
 
 export const sessionOptions = {
-  password: process.env.SESSION_PASSWORD!,
+  password: "your_very_secure_and_long_password_32_chars",
   cookieName: "karrot-session",
   cookieOptions: {
     secure: process.env.NODE_ENV === "production",
